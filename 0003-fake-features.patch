@@ -1,0 +1,46 @@
+Commit 9e1e5a642e28c "[net] gso: Support partial segmentation offload"
+(upstream 802ab55adc39a) and several following introduce support for GSO
+partial offload on the kernel network stack side. Driver support has been
+added in 5517f5c1beae3 "[netdrv] ixgbe/ixgbevf: Add support for GSO partial"
+(upstream b83e30104bd9) (and fixed up a bit in the following commits like
+3eb624d908a0).
+
+Backport changes: since 7.3 kernel has no GSO partial support, define
+NETIF_F_TSO_MANGLEID and NETIF_F_GSO_PARTIAL flags as 0 and remove part of
+ixgbevf_probe with GSO partial features setup.
+Index: src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h
+===================================================================
+--- src.orig/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:31:19.682593563 +0200
++++ src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:31:36.291441107 +0200
+@@ -5,6 +5,9 @@
+ #include <net/checksum.h>
+ 
+ 
++#define NETIF_F_TSO_MANGLEID 0
++
++
+ static inline unsigned char *skb_checksum_start(const struct sk_buff *skb)
+ {
+ 	return skb->head + skb->csum_start;
+Index: src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+===================================================================
+--- src.orig/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c	2017-04-11 15:31:13.755647968 +0200
++++ src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c	2017-04-11 15:31:52.966288046 +0200
+@@ -4114,17 +4114,6 @@
+ 			      NETIF_F_HW_CSUM |
+ 			      NETIF_F_SCTP_CRC;
+ 
+-#define IXGBEVF_GSO_PARTIAL_FEATURES (NETIF_F_GSO_GRE | \
+-				      NETIF_F_GSO_GRE_CSUM | \
+-				      NETIF_F_GSO_IPIP | \
+-				      NETIF_F_GSO_SIT | \
+-				      NETIF_F_GSO_UDP_TUNNEL | \
+-				      NETIF_F_GSO_UDP_TUNNEL_CSUM)
+-
+-	netdev->gso_partial_features = IXGBEVF_GSO_PARTIAL_FEATURES;
+-	netdev->hw_features |= NETIF_F_GSO_PARTIAL |
+-			       IXGBEVF_GSO_PARTIAL_FEATURES;
+-
+ 	netdev->features = netdev->hw_features;
+ 
+ 	if (pci_using_dac)

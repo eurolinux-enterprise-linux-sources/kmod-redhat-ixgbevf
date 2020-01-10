@@ -1,0 +1,24 @@
+Add compat header which will include shims which should cover discrepancies in
+kernel interfaces.
+Index: src/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h
+===================================================================
+--- src.orig/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h	2017-04-11 14:12:52.451591827 +0200
++++ src/drivers/net/ethernet/intel/ixgbevf/ixgbevf.h	2017-04-11 15:22:00.658410215 +0200
+@@ -37,6 +37,8 @@
+ 
+ #include "vf.h"
+ 
++#include "ixgbevf_backport_compat.h"
++
+ #ifdef CONFIG_NET_RX_BUSY_POLL
+ #include <net/busy_poll.h>
+ #define BP_EXTENDED_STATS
+Index: src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:21:04.257914479 +0200
+@@ -0,0 +1,4 @@
++#ifndef _RH_IXGBEVF_BACKPORT_COMPAT_H_
++#define _RH_IXGBEVF_BACKPORT_COMPAT_H_
++
++#endif /* #ifndef _RH_IXGBEVF_BACKPORT_COMPAT_H_ */

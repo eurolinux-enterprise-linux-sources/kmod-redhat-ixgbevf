@@ -1,0 +1,31 @@
+Commit 18ad1c654448 "[net] introduce csum_replace_by_diff() helper" (upstream
+8050c0f0274a "bpf: allow bpf_csum_diff to feed bpf_l3_csum_replace as well")
+introduced csum_replace_by_diff() helper function, which is then utilised in
+5517f5c1beae "[netdrv] ixgbe/ixgbevf: Add support for GSO partial" (upstream
+b83e30104bd9).
+
+Backport change: add implementation of csum_replace_by_diff() from "[net]
+introduce csum_replace_by_diff() helper" to ixgbe_backport_compat.h.
+Index: src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h
+===================================================================
+--- src.orig/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:24:09.360260452 +0200
++++ src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:27:59.124315745 +0200
+@@ -2,6 +2,7 @@
+ #define _RH_IXGBEVF_BACKPORT_COMPAT_H_
+ 
+ #include <linux/skbuff.h>
++#include <net/checksum.h>
+ 
+ 
+ static inline unsigned char *skb_checksum_start(const struct sk_buff *skb)
+@@ -9,4 +10,10 @@
+ 	return skb->head + skb->csum_start;
+ }
+ 
++
++static inline void csum_replace_by_diff(__sum16 *sum, __wsum diff)
++{
++	*sum = csum_fold(csum_add(diff, ~csum_unfold(*sum)));
++}
++
+ #endif /* #ifndef _RH_IXGBEVF_BACKPORT_COMPAT_H_ */

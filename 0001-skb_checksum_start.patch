@@ -1,0 +1,25 @@
+Commit d8394185304c "[net] Store checksum result for offloaded GSO checksums"
+introduces skb_checksum_start() helper, which is the utilised in 3eb624d908a0
+"[netdrv] ixgbe/ixgbevf: Don't use lco_csum to compute IPv4 checksum" (upstream
+c54cdc316dbd) and 5517f5c1beae "[netdrv] ixgbe/ixgbevf: Add support for GSO
+partial" (upstream b83e30104bd9).
+
+Backport changes: add implementation for skb_checksum_start() from "[net] Store
+checksum result for offloaded GSO checksums" to ixgbe_backport_compat.h.
+Index: src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h
+===================================================================
+--- src.orig/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:21:04.257914479 +0200
++++ src/drivers/net/ethernet/intel/ixgbevf/ixgbevf_backport_compat.h	2017-04-11 15:24:09.360260452 +0200
+@@ -1,4 +1,12 @@
+ #ifndef _RH_IXGBEVF_BACKPORT_COMPAT_H_
+ #define _RH_IXGBEVF_BACKPORT_COMPAT_H_
+ 
++#include <linux/skbuff.h>
++
++
++static inline unsigned char *skb_checksum_start(const struct sk_buff *skb)
++{
++	return skb->head + skb->csum_start;
++}
++
+ #endif /* #ifndef _RH_IXGBEVF_BACKPORT_COMPAT_H_ */
